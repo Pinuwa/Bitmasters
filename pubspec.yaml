@@ -1,0 +1,62 @@
+# pubspec.yaml
+name: ssl_project
+description: "A new Flutter project."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.9.0
+  cupertino_icons: ^1.0.6
+  flutter_svg: ^2.0.9
+  speech_to_text: ^6.6.0
+  flutter_sound: ^9.2.13
+  path_provider: ^2.1.3
+  permission_handler: ^11.3.1
+  camera: ^0.11.0+1
+  audioplayers: ^6.0.0
+  http: ^1.2.1
+  logging: ^1.2.0
+  shared_preferences: ^2.2.3
+  chewie: ^1.8.1
+  path: ^1.9.0
+  fl_chart: ^0.68.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/interfacepng.png
+    - assets/images/360_f_384759033_hrrjozhkau7mhxcxntc50cftwhzpre1o1.png
+    - assets/images/backimg.png
+    - assets/images/topinterface.png
+    - assets/images/a-1.png
+    - assets/images/0412-1-1.gif
+    - assets/images/ball.png
+    - assets/images/short.mp4
+    - assets/images/mic.png
+    - assets/images/correct.mp3
+    - assets/images/wrong.mp3
+
+  fonts:
+    - family: Yasarath
+      fonts:
+        - asset: assets/fonts/A12YASAR.TTF
+
+    - family: FMEconbld
+      fonts:
+        - asset: assets/fonts/FMEconbld Bold.ttf
+
+    - family: 0kd
+      fonts:
+        - asset: assets/fonts/0kd-namal.ttf
