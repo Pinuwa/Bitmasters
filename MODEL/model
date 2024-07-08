@@ -1,0 +1,178 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install -q tensorflow pandas scikit-learn
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from google.colab import files
+
+from google.colab import drive
+import pandas as pd
+
+# Mount Google Drive
+drive.mount('/content/drive')
+
+# Define the file path
+file_path = '/content/drive/MyDrive/hand_gesture_annotations.csv'
+
+# Read the CSV file
+df = pd.read_csv(file_path)
+
+# Display the first few rows of the dataframe
+print(df.head())
+
+
+X = df.drop(columns=['classname'])
+y = df['classname']
+
+# Encode the labels
+label_encoder = LabelEncoder()
+y_encoded = label_encoder.fit_transform(y)
+
+# Normalize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_encoded, test_size=0.2, random_state=42)
+
+# Reshape the data to fit the CNN input requirements
+X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], 1)
+X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], 1)
+
+# Build the CNN model
+model = Sequential([
+    Conv1D(64, kernel_size=3, activation='relu', input_shape=(X_train.shape[1], 1)),
+    Dropout(0.5),
+    Conv1D(32, kernel_size=3, activation='relu'),
+    Dropout(0.5),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(len(label_encoder.classes_), activation='softmax')
+])
+
+# Compile the model
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_split=0.2)
+
+# Evaluate the model
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f'Test accuracy: {test_acc}')
+
+
+import matplotlib.pyplot as plt
+
+# Plot training & validation accuracy values
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+
+# Plot training & validation loss values
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+
+plt.show()
+
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred_classes)
+print("Confusion Matrix:")
+print(cm)
+
+# Classification report
+cr = classification_report(y_test, y_pred_classes, target_names=label_encoder.classes_)
+print("Classification Report:")
+print(cr)
+
+
+# Save the model
+model.save('hand_gesture_cnn_model.h5')
+
+# Save the label encoder
+import pickle
+with open('label_encoder.pkl', 'wb') as file:
+    pickle.dump(label_encoder, file)
+
+
+from google.colab import drive
+drive.mount('/content/drive')
+model.save('/content/drive/My Drive/hand_gesture_cnn_model.h5')
+
+
+model.save('hand_gesture_cnn_model.h5')
+
+from google.colab import files
+files.download('hand_gesture_cnn_model.h5')
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+
+# Load your trained model
+model = load_model('/content/drive/MyDrive/hand_gesture_cnn_model.h5')  # Replace with the path to your trained model file
+
+# Function to preprocess your image
+def preprocess_image(image_path):
+    img = image.load_img(image_path, target_size=(63, 1), color_mode='grayscale')  # Resize and convert to grayscale
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)  # Expand dimensions to match batch size
+    return img_array
+
+# Example image path
+image_path = '/content/drive/MyDrive/original data/ය්‍/11.jpg'  # Replace with the path to your image file
+
+# Preprocess the image
+processed_image = preprocess_image(image_path)
+
+# Print processed image shape for debugging
+print(f"Processed Image Shape: {processed_image.shape}")
+
+# Predict class probabilities for the processed image
+predictions = model.predict(processed_image)
+
+# Print predictions for debugging
+print(f"Predictions: {predictions}")
+
+# Convert probabilities to class labels
+try:
+    predicted_class_idx = np.argmax(predictions, axis=1)[0]
+    print(f"Predicted Class Index: {predicted_class_idx}")
+
+    # Mapping from class index to class name (replace with your own mapping if available)
+    class_mapping = {
+        11:"a",
+        20:"ya",
+        10:"Na"
+        # Add more mappings as per your model's classes
+    }
+
+    # Get the predicted class name
+    predicted_class_name = class_mapping.get(predicted_class_idx, "Unknown")
+    print(f"Predicted Class: {predicted_class_name}")
+
+except Exception as e:
+    print(f"Error during prediction: {e}")
+
+
